@@ -1,6 +1,26 @@
 # 提示词
 
-你作为web UI专家，请以2025年最流行的web开发前端框架和相关技术栈的最佳实践，按照下面的描述生成一个AI提示词优化的web app的UI界面：
+作为Web UI专家，请根据下面的Web应用开发架构设计中的前端框架和最佳实践，以及后续的界面描述，为AI提示词优化应用生成用户界面。
+
+下面是架构设计：
+
+## 方案一：React + Vite + TypeScript + Tailwind CSS（前端）& Node.js + Express + TypeScript（后端）
+
+### 技术栈及主流版本（2025年预测）
+- 前端：
+  - React 18.x
+  - Vite 5.x
+  - TypeScript 5.x
+  - Tailwind CSS 4.x
+  - React Router v6.x
+- 后端：
+  - Node.js 20.x
+  - Express 5.x
+  - TypeScript 5.x
+  - Jest 30.x（测试）
+  - pino/winston（日志）
+
+下面是界面描述：
 
 ### Overall Layout
 The interface follows a two-column layout:
