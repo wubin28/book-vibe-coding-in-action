@@ -1,0 +1,1 @@
+@workspace /setupTests 作为前端自动化单元测试专家，请查看 #file:App.tsx  代码，根据 #file:rule-architecture.md  文件指定的前端单元测试技术栈及版本号，帮我搭建前端单元测试框架。同时编写一个简单的测试用例（验证前端页面是否存在 Optimize Prompt 按钮），以验证测试框架的正常运行。

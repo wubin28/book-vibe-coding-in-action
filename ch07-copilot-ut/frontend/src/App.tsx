@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { PenLine, Clock } from "lucide-react";
+import { useState } from 'react';
+import { PenLine, Clock } from 'lucide-react';
 
 /**
  * The `App` component serves as the main entry point for a React application
