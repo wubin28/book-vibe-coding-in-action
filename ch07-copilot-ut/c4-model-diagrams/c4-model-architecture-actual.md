@@ -29,7 +29,7 @@ C4Container
 
     System_Boundary(webApp, "Promptyoo-0 Web Application") {
         Container(frontendApp, "________Frontend Application________", "React v18.3.1, Vite v5.4.2, TypeScript v5.5.3", "Provides the web UI for users")
-        Container(backendServer, "____________Backend Server____________", "Node.js v18.18.0, Express v4.18.2, TypeScript v5.3.3", "Provides API endpoints and business logic")
+        Container(backendServer, "____________Backend Server____________", "Node.js v20.10.5, Express v4.18.2, TypeScript v5.3.3", "Provides API endpoints and business logic")
     }
 
     System_Ext(deepseek, "DeepSeek API - OpenAI API v4.28.0", "External AI service")
