@@ -324,6 +324,12 @@ git clone https://github.com/wubin28/book-vibe-coding-in-action.git
 cd book-vibe-coding-in-action
 ```
 
+## 如何运行代码
+
+- [运行第6章代码](ch06-copilot-feat/README.md)
+
+- [运行第7章代码](ch07-copilot-ut/README.md)
+
 ## 贡献
 
 本仓库与书籍创作同步维护。如果你发现任何问题、有改进建议或想要贡献代码，欢迎提出问题或提交拉取请求。
