@@ -75,9 +75,27 @@ export class ApiService {
       res.end();
     } catch (error) {
       console.error("Error in optimize:", error);
-      res.write(
-        `data: ${JSON.stringify({ error: "Failed to optimize prompt", details: error instanceof Error ? error.message : String(error) })}\n\n`,
-      );
+      
+      // Check if error is related to API key
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.toLowerCase().includes('api key') || errorMessage.toLowerCase().includes('authentication')) {
+        // Send specific error for API key issues
+        res.write(
+          `data: ${JSON.stringify({ 
+            error: ".env文件中的DEEPSEEK_API_KEY无效", 
+            useTemplate: true,
+            details: errorMessage 
+          })}\n\n`
+        );
+      } else {
+        // Send general error
+        res.write(
+          `data: ${JSON.stringify({ 
+            error: "Failed to optimize prompt", 
+            details: errorMessage 
+          })}\n\n`
+        );
+      }
       res.end();
     }
   }

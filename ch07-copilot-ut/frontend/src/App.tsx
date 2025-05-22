@@ -116,7 +116,16 @@ What Concern you have about this discussion with AI? ${formData.concern || "AI h
               const data = JSON.parse(line.substring(6));
 
               if (data.error) {
-                throw new Error(data.error);
+                if (data.useTemplate) {
+                  // Generate fallback template if API key is invalid
+                  const fallbackTemplate = `I want you to act as a ${formData.role || "Prompt Optimization Expert"} for ${formData.audience || "AI tool beginners"} in the field of ${formData.boundary || "Prompt optimization"}.
+My goal is to ${formData.purpose || "find popular prompt optimization tools"} and I need the response in the format of ${formData.output || "tool name (official website link)"}.
+I'm concerned about ${formData.concern || "AI hallucinations (if not found, please be honest and don't make up information)"}`;
+                  setOptimizedPrompt(fallbackTemplate);
+                } else {
+                  throw new Error(data.error);
+                }
+                continue;
               }
 
               if (data.done) {
@@ -130,13 +139,14 @@ What Concern you have about this discussion with AI? ${formData.concern || "AI h
               }
             } catch (e) {
               console.error("Error parsing SSE data:", e);
+              setOptimizedPrompt("Error: " + (e instanceof Error ? e.message : String(e)));
             }
           }
         }
       }
     } catch (error) {
       console.error("Error optimizing prompt:", error);
-      setOptimizedPrompt("Error: Failed to optimize prompt. Please try again.");
+      setOptimizedPrompt("Error: " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsLoading(false);
     }

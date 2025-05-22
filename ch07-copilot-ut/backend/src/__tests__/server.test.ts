@@ -188,6 +188,26 @@ describe('ApiService', () => {
     });
     // 验证即使模板为空也能正常调用 API
   });
+
+  test('optimizeTemplate should handle API key errors gracefully', async () => {
+    // Given
+    const template = 'Test template';
+    const apiKeyError = new Error('Invalid API key provided');
+    apiKeyError.name = 'AuthenticationError';
+    mockOpenAIClient.chat.completions.create.mockRejectedValue(apiKeyError);
+    
+    // When
+    await apiService.optimizeTemplate(template, mockResponse);
+    
+    // Then
+    expect(mockResponse.write).toHaveBeenCalledWith(
+      expect.stringContaining('.env文件中的DEEPSEEK_API_KEY无效')
+    );
+    expect(mockResponse.write).toHaveBeenCalledWith(
+      expect.stringContaining('useTemplate')
+    );
+    expect(mockResponse.end).toHaveBeenCalled();
+  });
 });
 
 describe('Express App', () => {

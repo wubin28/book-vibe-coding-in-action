@@ -192,6 +192,41 @@ describe('App component', () => {
     expect(promptText).toBeInTheDocument()
   })
 
+  // Test handling API key error and showing fallback template
+  it('handles API key error and shows fallback template', async () => {
+    // given
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      body: {
+        getReader: () => ({
+          read: vi.fn().mockResolvedValueOnce({
+            done: false,
+            value: new TextEncoder().encode('data: {"error":".env文件中的DEEPSEEK_API_KEY无效","useTemplate":true}')
+          }).mockResolvedValueOnce({
+            done: true
+          })
+        })
+      }
+    });
+    vi.spyOn(global, 'fetch').mockImplementation(mockFetch);
+    
+    render(<App />);
+    const user = userEvent.setup();
+    
+    // Fill in form data
+    const roleInput = screen.getByPlaceholderText(/e\.g\., prompt optimization expert/i);
+    await user.type(roleInput, 'Custom Role');
+    
+    // when
+    const optimizeButton = screen.getByRole('button', { name: /optimize prompt/i });
+    await user.click(optimizeButton);
+    
+    // then
+    // Wait for and verify the fallback template appears
+    const fallbackTemplate = await screen.findByText(/I want you to act as a Custom Role for/i);
+    expect(fallbackTemplate).toBeInTheDocument();
+  })
+
   // Clean up mocks after tests
   afterEach(() => {
     vi.restoreAllMocks()
