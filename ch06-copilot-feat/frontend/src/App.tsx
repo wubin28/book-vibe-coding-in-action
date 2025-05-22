@@ -112,23 +112,33 @@ What Concern you have about this discussion with AI? ${formData.concern || "AI h
         const lines = chunk.split("\n\n");
         for (const line of lines) {
           if (line.startsWith("data: ")) {
+            let parsedData: any;
             try {
-              const data = JSON.parse(line.substring(6));
+              parsedData = JSON.parse(line.substring(6));
 
-              if (data.error) {
-                throw new Error(data.error);
+              if (parsedData.error) {
+                // If there's a fallback template, use it
+                if (parsedData.fallbackTemplate) {
+                  setOptimizedPrompt(parsedData.fallbackTemplate);
+                }
+                throw new Error(parsedData.error);
               }
 
-              if (data.done) {
+              if (parsedData.done) {
                 // Stream completed
                 continue;
               }
 
-              if (data.content) {
+              if (parsedData.content) {
                 // Append new content
-                setOptimizedPrompt((prev) => prev + data.content);
+                setOptimizedPrompt((prev) => prev + parsedData.content);
               }
             } catch (e) {
+              if (e instanceof Error) {
+                setOptimizedPrompt((prev) => 
+                  prev || `Error: ${e.message}. ${parsedData?.fallbackTemplate ? "\n\nFallback template:\n" + parsedData.fallbackTemplate : ""}`
+                );
+              }
               console.error("Error parsing SSE data:", e);
             }
           }
@@ -136,7 +146,11 @@ What Concern you have about this discussion with AI? ${formData.concern || "AI h
       }
     } catch (error) {
       console.error("Error optimizing prompt:", error);
-      setOptimizedPrompt("Error: Failed to optimize prompt. Please try again.");
+      if (error instanceof Error) {
+        setOptimizedPrompt(`Error: ${error.message}`);
+      } else {
+        setOptimizedPrompt("Error: Failed to optimize prompt. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

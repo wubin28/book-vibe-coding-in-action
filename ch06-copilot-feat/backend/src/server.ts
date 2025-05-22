@@ -46,6 +46,28 @@ try {
   process.exit(1);
 }
 
+// Add this function before the app.post("/api/optimize") endpoint
+function generateFallbackTemplate(template: string) {
+  // Extract values from the template using regex
+  const roleMatch = template.match(/What Role you want AI to play\? (.*?)\./) || [];
+  const audienceMatch = template.match(/What Audience you want AI to generate content for\? (.*?)\./) || [];
+  const boundaryMatch = template.match(/What Boundary should AI focus on for this discussion\? (.*?)\./) || [];
+  const purposeMatch = template.match(/What Purpose you want AI to help you achieve\? (.*?)\./) || [];
+  const outputMatch = template.match(/What Output format you want AI to generate\? (.*?)\./) || [];
+  const concernMatch = template.match(/What Concern you have about this discussion with AI\? (.*?)\./) || [];
+
+  const role = roleMatch[1] || "Prompt Optimization Expert";
+  const audience = audienceMatch[1] || "AI tool beginners";
+  const boundary = boundaryMatch[1] || "Prompt optimization";
+  const purpose = purposeMatch[1] || "find popular prompt optimization tools";
+  const output = outputMatch[1] || "tool name (official website link)";
+  const concern = concernMatch[1] || "AI hallucinations";
+
+  return `I want you to act as a ${role} for ${audience} in the field of ${boundary}.
+My goal is to ${purpose} and I need the response in the format of ${output}.
+I'm concerned about ${concern}.`;
+}
+
 app.post("/api/optimize", async (req: Request, res: Response) => {
   try {
     const { template } = req.body;
@@ -61,24 +83,21 @@ app.post("/api/optimize", async (req: Request, res: Response) => {
     res.setHeader("Connection", "keep-alive");
 
     console.log("Calling DeepSeek API with streaming...");
-    const stream = await openai.chat.completions.create({
-      model: "deepseek-chat",
-      messages: [
-        {
-          role: "user",
-          content: template,
-        },
-      ],
-      stream: true,
-    }).catch(error => {
-      console.error("DeepSeek API error:", error);
-      throw new Error(error instanceof Error ? error.message : "Failed to connect to DeepSeek API");
-    });
-
-    // Initialize full content for logging
-    let fullContent = "";
-
     try {
+      const stream = await openai.chat.completions.create({
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "user",
+            content: template,
+          },
+        ],
+        stream: true,
+      });
+
+      // Initialize full content for logging
+      let fullContent = "";
+
       // Process the stream
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || "";
@@ -96,9 +115,18 @@ app.post("/api/optimize", async (req: Request, res: Response) => {
       // End the stream
       res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
       res.end();
-    } catch (streamError) {
-      console.error("Stream processing error:", streamError);
-      throw new Error("Failed to process the response stream");
+    } catch (apiError) {
+      console.error("DeepSeek API error:", apiError);
+      
+      // Generate fallback template
+      const fallbackTemplate = generateFallbackTemplate(template);
+      
+      // Send error message and fallback template
+      res.write(`data: ${JSON.stringify({ 
+        error: ".env文件中的DEEPSEEK_API_KEY无效",
+        fallbackTemplate 
+      })}\n\n`);
+      res.end();
     }
   } catch (error) {
     console.error("Error in /api/optimize:", error);
