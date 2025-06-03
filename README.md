@@ -51,7 +51,7 @@ Vibe编程的价值
 4.4 浏览Python代码
 4.5 增加需求
 
-第5章 用bolt、Trae和Cursor快速实现产品原型
+第5章 用bolt、Trae和Cursor快速实现Web产品原型
 5.1 Promptyoo-1 Web应用需求分析
 5.1.1 描述业务需求
 5.1.2 将业务需求转为PRD时踩坑
